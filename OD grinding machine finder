@@ -1,0 +1,30 @@
+import pandas as pd
+
+# Read the Excel file
+df = pd.read_excel("Grind machines.xlsx")
+
+# Define function to filter machines based on user input
+def find_suitable_machine(df, diameter, length, grind_length, spindle_power):
+    suitable_machines = df[(df['swing(mm)'] >= diameter) &
+                           (df['Admit between centre(mm)'] >= length) &
+                           (df['Grinding length(mm)'] >= grind_length) &
+                           (df['Spindle power(kw)'] == spindle_power)]
+    return suitable_machines 
+
+print(" Helloo Hii :)")
+
+# Get user input
+diameter = float(input("Enter component diameter(mm): "))
+length = float(input("Enter component length(mm): "))
+grind_length = float(input("Enter grinding length(mm): "))
+spindle_power = float(input("Enter spindle power(kw): "))
+
+# Find suitable machine
+suitable_machines = find_suitable_machine(df, diameter, length, grind_length, spindle_power)
+
+# Check if any suitable machine found
+if not suitable_machines.empty:
+    print("Suitable machine(s) for the given input:")
+    print(suitable_machines[['Machine Type', 'Model type ']])
+else:
+    print("No suitable machine found for the given input.")
