@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Player Selection</title>
+<style>
+    /* Styles for better appearance */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    th, td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .player-info {
+        display: none;
+    }
+    .show {
+        display: table-row;
+    }
+    #export-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<table>
+    <thead>
+        <tr>
+            <th>Team</th>
+            <th>Players</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Team 1 -->
+        <tr class="team">
+            <td>
+                <input type="checkbox" class="team-checkbox" id="team1">
+                <label for="team1">Team 1</label>
+            </td>
+            <td class="player-info">
+                <div>
+                    <input type="radio" name="team1" id="player1" value="Player 1">
+                    <label for="player1">Player 1</label>
+                    <span>(Jersey Number: 10, ID: 1001)</span>
+                </div>
+                <div>
+                    <input type="radio" name="team1" id="player2" value="Player 2">
+                    <label for="player2">Player 2</label>
+                    <span>(Jersey Number: 7, ID: 1002)</span>
+                </div>
+                <div>
+                    <input type="radio" name="team1" id="player3" value="Player 3">
+                    <label for="player3">Player 3</label>
+                    <span>(Jersey Number: 9, ID: 1003)</span>
+                </div>
+            </td>
+        </tr>
+        <!-- Team 2 -->
+        <tr class="team">
+            <td>
+                <input type="checkbox" class="team-checkbox" id="team2">
+                <label for="team2">Team 2</label>
+            </td>
+            <td class="player-info">
+                <div>
+                    <input type="radio" name="team2" id="player4" value="Player 4">
+                    <label for="player4">Player 4</label>
+                    <span>(Jersey Number: 11, ID: 1004)</span>
+                </div>
+                <div>
+                    <input type="radio" name="team2" id="player5" value="Player 5">
+                    <label for="player5">Player 5</label>
+                    <span>(Jersey Number: 8, ID: 1005)</span>
+                </div>
+                <div>
+                    <input type="radio" name="team2" id="player6" value="Player 6">
+                    <label for="player6">Player 6</label>
+                    <span>(Jersey Number: 6, ID: 1006)</span>
+                </div>
+            </td>
+        </tr>
+        <!-- Team 3 -->
+        <tr class="team">
+            <td>
+                <input type="checkbox" class="team-checkbox" id="team3">
+                <label for="team3">Team 3</label>
+            </td>
+            <td class="player-info">
+                <div>
+                    <input type="radio" name="team3" id="player7" value="Player 7">
+                    <label for="player7">Player 7</label>
+                    <span>(Jersey Number: 14, ID: 1007)</span>
+                </div>
+                <div>
+                    <input type="radio" name="team3" id="player8" value="Player 8">
+                    <label for="player8">Player 8</label>
+                    <span>(Jersey Number: 5, ID: 1008)</span>
+                </div>
+                <div>
+                    <input type="radio" name="team3" id="player9" value="Player 9">
+                    <label for="player9">Player 9</label>
+                    <span>(Jersey Number: 3, ID: 1009)</span>
+                </div>
+            </td>
+        </tr>
+        <!-- Team 4 -->
+        <tr class="team">
+            <td>
+                <input type="checkbox" class="team-checkbox" id="team4">
+                <label for="team4">Team 4</label>
+            </td>
+            <td class="player-info">
+                <div>
+                    <input type="radio" name="team4" id="player10" value="Player 10">
+                    <label for="player10">Player 10</label>
+                    <span>(Jersey Number: 20, ID: 1010)</span>
+                </div>
+                <div>
+                    <input type="radio" name="team4" id="player11" value="Player 11">
+                    <label for="player11">Player 11</label>
+                    <span>(Jersey Number: 2, ID: 1011)</span>
+                </div>
+                <div>
+                    <input type="radio" name="team4" id="player12" value="Player 12">
+                    <label for="player12">Player 12</label>
+                    <span>(Jersey Number: 4, ID: 1012)</span>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Submit Button -->
+<button id="export-button">Export Selected Player Data</button>
+
+<!-- Script for Excel Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+<script>
+// Event listener to show/hide player info when team checkbox is clicked
+document.querySelectorAll('.team-checkbox').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+        var playerInfo = this.parentNode.parentNode.querySelector('.player-info');
+        if (this.checked) {
+            playerInfo.classList.add('show');
+        } else {
+            playerInfo.classList.remove('show');
+        }
+    });
+});
+
+// Event listener to display player details when radio button is selected
+document.querySelectorAll('.player-info input[type="radio"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        var playerName = document.querySelector('label[for="' + this.id + '"]').textContent;
+        var playerDetails = this.nextElementSibling.textContent.match(/\d+/g); // Extract numbers from the span text
+        var playerTable = document.getElementById('player-details');
+        var playerTableBody = playerTable.querySelector('tbody');
+        
+        if (this.checked) {
+            playerTable.style.display = 'table';
+            playerTableBody.innerHTML = '<tr><td>' + playerName + '</td><td>' + playerDetails[0] + '</td><td>' + playerDetails[1] + '</td></tr>';
+        } else {
+            playerTable.style.display = 'none';
+            playerTableBody.innerHTML = '';
+        }
+    });
+});
+
+document.getElementById('export-button').addEventListener('click', function() {
+    var selectedPlayers = [];
+    document.querySelectorAll('.player-info input[type="radio"]:checked').forEach(function(radio) {
+        var playerName = document.querySelector('label[for="' + radio.id + '"]').textContent;
+        var playerDetails = radio.nextElementSibling.textContent.match(/\d+/g); // Extract numbers from the span text
+        selectedPlayers.push([playerName, playerDetails[0], playerDetails[1]]);
+    });
+
+    if (selectedPlayers.length > 0) {
+        // Create a new Excel file
+        var wb = XLSX.utils.book_new();
+        var ws = XLSX.utils.aoa_to_sheet([['Player Name', 'Jersey Number', 'ID']].concat(selectedPlayers));
+        XLSX.utils.book_append_sheet(wb, ws, "Player Data");
+
+        // Save the file
+        var fileName = "selected_players.xlsx";
+        XLSX.writeFile(wb, fileName);
+    } else {
+        alert("No player data selected!");
+    }
+});
+
+
+// Function to convert s to an ArrayBuffer
+function s2ab(s) {
+    var buf = new ArrayBuffer(s.length);
+    var view = new Uint8Array(buf);
+    for (var i = 0; i < s.length; i++) {
+        view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buf;
+}
+</script>
+
+</body>
+</html>
+
