@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team and Player Selection</title>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .exportButton {
+        margin-left: 20px; /* Adjust margin as needed */
+    }
+</style>
+<script>
+function displaySelectedPlayers() {
+    const selectedTeams = document.querySelectorAll('input[name="team"]:checked');
+    const selectedPlayers = [];
+
+    selectedTeams.forEach(team => {
+        const teamName = team.value;
+        const selectedPlayerRadios = document.querySelectorAll(`input[name="player${teamName}"]:checked`);
+        selectedPlayerRadios.forEach(player => {
+            selectedPlayers.push({
+                team: player.dataset.team,
+                name: player.dataset.name,
+                jersey: player.dataset.jersey,
+                id: player.dataset.id
+            });
+        });
+    });
+
+    return selectedPlayers;
+}
+
+function exportToExcel() {
+    const selectedPlayers = displaySelectedPlayers();
+
+    if (selectedPlayers.length > 0) {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Team,Name,Jersey,ID\n";
+        selectedPlayers.forEach(player => {
+            csvContent += `${player.team},${player.name},${player.jersey},${player.id}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "selected_players.csv");
+        document.body.appendChild(link); // Required for Firefox
+        link.click();
+    } else {
+        alert("No players selected.");
+    }
+}
+
+function handleSubmit() {
+    const selectedPlayers = displaySelectedPlayers();
+    const playerInfoDiv = document.getElementById("playerInfo");
+  
+    if (selectedPlayers.length > 0) {
+        let infoHtml = '<p>Selected Players:</p>';
+        selectedPlayers.forEach(player => {
+            infoHtml += `<p>Team: ${player.team}, Name: ${player.name}, Jersey: ${player.jersey}, ID: ${player.id}</p>`;
+        });
+        playerInfoDiv.innerHTML = infoHtml;
+    } else {
+        playerInfoDiv.innerHTML = "<p>No players selected</p>";
+    }
+}
+</script>
+</head>
+<body>
+
+<h2>Team and Player Selection</h2>
+
+<table>
+  <tr>
+    <th>Team</th>
+    <th>Name</th>
+    <th>Jersey</th>
+    <th>ID</th>
+  </tr>
+  <tr>
+    <td rowspan="3">
+        <input type="checkbox" id="team_csk" name="team" value="csk" onclick="displaySelectedPlayers()">
+        <label for="team_csk">CSK</label>
+    </td>
+    <td>
+        <input type="radio" id="dhoni" name="playercsk" value="dhoni" data-team="csk" data-name="Dhoni" data-jersey="07" data-id="1" onclick="displaySelectedPlayers()">
+        <label for="dhoni">Dhoni</label> 
+    </td>
+    <td>07</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>
+        <input type="radio" id="jaddu" name="playercsk" value="jaddu" data-team="csk" data-name="Jaddu" data-jersey="08" data-id="2" onclick="displaySelectedPlayers()">
+        <label for="jaddu">Jaddu</label> 
+    </td>
+    <td>08</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>
+        <input type="radio" id="dube" name="playercsk" value="dube" data-team="csk" data-name="Dube" data-jersey="30" data-id="3" onclick="displaySelectedPlayers()">
+        <label for="dube">Dube</label> 
+    </td>
+    <td>30</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td rowspan="3">
+        <input type="checkbox" id="team_mi" name="team" value="mi" onclick="displaySelectedPlayers()">
+        <label for="team_mi">MI</label>
+    </td>
+    <td>
+        <input type="radio" id="rohit" name="playermi" value="rohit" data-team="mi" data-name="Rohit" data-jersey="45" data-id="4" onclick="displaySelectedPlayers()">
+        <label for="rohit">Rohit</label> 
+    </td>
+    <td>45</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>
+        <input type="radio" id="pollard" name="playermi" value="pollard" data-team="mi" data-name="Pollard" data-jersey="17" data-id="5" onclick="displaySelectedPlayers()">
+        <label for="pollard">Pollard</label> 
+    </td>
+    <td>17</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>
+        <input type="radio" id="bumrah" name="playermi" value="bumrah" data-team="mi" data-name="Bumrah" data-jersey="20" data-id="6" onclick="displaySelectedPlayers()">
+        <label for="bumrah">Bumrah</label> 
+    </td>
+    <td>20</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td rowspan="3">
+        <input type="checkbox" id="team_rcb" name="team" value="rcb" onclick="displaySelectedPlayers()">
+        <label for="team_rcb">RCB</label>
+    </td>
+    <td>
+        <input type="radio" id="virat" name="playerrcb" value="virat" data-team="rcb" data-name="Virat" data-jersey="18" data-id="7" onclick="displaySelectedPlayers()">
+        <label for="virat">Virat</label> 
+    </td>
+    <td>18</td>
+    <td>7</td>
+  </tr>
+  <tr>
+    <td>
+        <input type="radio" id="abd" name="playerrcb" value="abd" data-team="rcb" data-name="ABD" data-jersey="12" data-id="8" onclick="displaySelectedPlayers()">
+        <label for="abd">ABD</label> 
+    </td>
+    <td>12</td>
+    <td>8</td>
+  </tr>
+  <tr>
+    <td>
+        <input type="radio" id="chahal" name="playerrcb" value="chahal" data-team="rcb" data-name="Chahal" data-jersey="23" data-id="9" onclick="displaySelectedPlayers()">
+        <label for="chahal">Chahal</label> 
+    </td>
+    <td>23</td>
+    <td>9</td>
+  </tr>
+  <!-- Add more teams and players here -->
+</table>
+<input type="button" value="Export to Excel" onclick="exportToExcel()" class="exportButton"> <!-- Added class for styling -->
+<input type="submit" value="Submit" onclick="handleSubmit()">
+
+<div id="playerInfo">
+ <p>No players selected</p>
+</div>
+</body>
+</html>
