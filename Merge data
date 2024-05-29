@@ -1,0 +1,13 @@
+import pandas as pd
+
+df1 = pd.read_excel("MGTG ApplicationToolkit_1.xlsx", skiprows=4)
+
+df2 = pd.read_excel("MGTB ApplicationToolkit_2.xlsx", skiprows=4)
+
+df = pd.concat([df1, df2])
+
+df = df.drop_duplicates(subset='SDoc ID')
+
+df.to_excel('merge.xlsx', index=False)
+
+print("done")
