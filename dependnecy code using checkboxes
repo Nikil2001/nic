@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MGT - Machine Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6e3e3;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #333131;
+            margin-left: 20px; /* Adjust margin to align left */
+        }
+        h2 {
+            color: #885555; /* New color for h2 */
+            margin-left: 20px; /* Adjust margin to align left */
+        }
+        form {
+            max-width: 300px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 30px rgba(52, 52, 150, 0.1);
+            margin-left: 18px; /* Adjust margin to align left */
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #0a0909;
+            text-align: left; /* Align labels to the left */
+            margin-left: 20px; /* Adjust margin to align left */
+        }
+        input[type="text"],
+        select {
+            width: calc(100% - 40px); /* Adjust width for better alignment */
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-left: 20px; /* Adjust margin to align left */
+        }
+        input[type="file"] {
+            width: calc(100% - 40px); /* Adjust width for better alignment */
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 2px solid #191c1f; /* Blue border */
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            margin-left: 20px; /* Adjust margin to align left */
+        }
+        input[type="submit"] {
+            width: calc(50% - 40px); /* Adjust width for better alignment */
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+            margin-left: 20px; /* Adjust margin to align left */
+        }
+        input[type="submit"]:hover {
+            background-color: #32a137;
+        }
+        #excelData {
+            margin-top: -400px;
+            margin-left: 10px; /* Adjust margin to align left */
+            float: right; /* Align to the right */
+            width: 70%; /* Set width to 50% */
+            overflow: auto; /* Add overflow to scroll if necessary */
+            border: 2px solid #ccc; /* Add border */
+            padding: 10px; /* Add padding for spacing */
+            border-radius: 5px; /* Add border radius for rounded corners */
+        }
+        
+        #excelData table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        #excelData td,
+        #excelData th {
+            border: 1px solid #ccc; /* Add border to each cell */
+            padding: 8px;
+        }
+        
+        #excelData th {
+            background-color: #f2f2f2; /* Light gray background color for table headers */
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        td {
+            padding: 8px;
+        }
+        .selectedRow {
+            background-color: #c7e4f7; /* Light blue color when row is selected */
+        }
+        #printSelectedData {
+            display: block;
+            margin: 20px auto; /* Center the button horizontally */
+            background-color: #0b4481; /* Blue color for button */
+            color: white;
+            padding: 10px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        #printSelectedData:hover {
+            background-color: #1326d4; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+
+<h1>MGTB</h1>
+<h2>SuperBOM</h2>
+
+<form id="uploadForm" enctype="multipart/form-data">
+    <label for="customer">Customer:</label>
+    <input type="text" id="customer" name="customer" pattern="[A-Za-z]+" title="Please enter only alphabetic characters">
+    
+    
+    <label for="machineNumber">Machine Number:</label>
+    <input type="text" id="machineNumber" name="machineNumber" pattern="[0-9]+" title="Please enter only numeric characters">
+    
+    
+    <label for="machineModel">Machine Model:</label>
+    <select id="machineModel" name="machineModel">
+        <option value="model1">Model 1</option>
+        <option value="model2">Model 2</option>
+        <option value="model3">Model 3</option>
+        <!-- Add more options as needed -->
+    </select>
+    
+    <label for="excelFile">Upload Excel File:</label>
+    <input type="file" id="excelFile" name="excelFile">
+    
+    <input type="submit" value="Submit">
+</form>
+
+<div id="excelData"></div>
+
+<button id="printSelectedData" style="display: none;">Export to excel</button>
+
+<div id="selectedData"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent form submission
+
+    var formData = new FormData(this); // Create form data object
+    var excelFile = formData.get('excelFile');
+
+    if (!excelFile) {
+        alert('Please select an Excel file.');
+        return;
+    }
+
+    var reader = new FileReader(); // Create FileReader object
+
+    reader.onload = function(event) {
+        var data = new Uint8Array(event.target.result); // Get file data as Uint8Array
+        var workbook = XLSX.read(data, { type: 'array' }); // Parse Excel file
+
+        var sheetName = workbook.SheetNames[0]; // Get the first sheet name
+        var sheet = workbook.Sheets[sheetName]; // Get the first sheet
+
+        var excelData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convert sheet to JSON
+
+        // Display data with checkboxes
+        var html = '<table>';
+        excelData.forEach(function(row, rowIndex) {
+            html += '<tr>';
+            row.forEach(function(cell, cellIndex) {
+                html += '<td>';
+                if (cellIndex === 0) { // Add checkbox for the first column
+                    html += '<input type="checkbox" class="selectedRow" value="' + rowIndex + '" data-dependencies="' + row[4] + '">';
+                }
+                html += cell + '</td>';
+            });
+            html += '</tr>';
+        });
+        html += '</table>';
+
+        document.getElementById('excelData').innerHTML = html;
+
+        // Show submit button for selected data
+        document.getElementById('printSelectedData').style.display = 'block';
+
+        // Add event listener to checkboxes to handle dependencies
+        var checkboxes = document.querySelectorAll('.selectedRow');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('click', function() {
+                handleDependencies(this);
+            });
+        });
+    }; 
+
+    reader.readAsArrayBuffer(excelFile); // Read file as array buffer
+});
+
+function handleDependencies(checkbox) {
+    var rowIndex = parseInt(checkbox.value); // Get the index of the current row
+    var checkboxesToEnable = document.querySelectorAll('.selectedRow[data-dependencies*="' + rowIndex + '"]');
+    
+    checkboxesToEnable.forEach(function(checkboxToEnable) {
+        checkboxToEnable.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+            checkboxToEnable.checked = false;
+        }
+        handleDependencies(checkboxToEnable); // Handle dependencies recursively
+    });
+    
+}
+
+
+document.getElementById('printSelectedData').addEventListener('click', function() {
+    var selectedRows = document.querySelectorAll('.selectedRow:checked');
+    var updatedWorkbook = XLSX.utils.book_new();
+    var updatedSheet = XLSX.utils.aoa_to_sheet([['Customer', 'Machine Number', 'Machine Model']]); // Add header row
+    var selectedData = []; // Array to store selected rows
+    var orderCounter = selectedData.length + 1; // Start the order counter from the length of existing selectedData array
+    
+    selectedRows.forEach(function(row) {
+        var rowIndex = parseInt(row.value); // Parse value to integer
+        var rowData = [];
+        var cells = document.querySelectorAll('#excelData tr:nth-child(' + (rowIndex + 1) + ') td');
+        cells.forEach(function(cell) {
+            rowData.push(cell.textContent);
+        });
+        selectedData.push({ data: rowData, order: orderCounter++ }); // Add each selected row with its order to the array
+       
+    });
+
+    
+
+    // Sort selected data based on order
+    selectedData.sort(function(a, b) {
+        return a.order - b.order;
+    });
+
+    // Accumulate rows into an array of arrays
+var rowDataArray = selectedData.map(function(row) {
+    return row.data;
+});  
+
+// Add the accumulated rows to the sheet
+XLSX.utils.sheet_add_aoa(updatedSheet, rowDataArray);
+
+// Append the updated sheet to the workbook
+XLSX.utils.book_append_sheet(updatedWorkbook, updatedSheet, 'updated_excel');
+
+// Convert the workbook to binary format
+var wbout = XLSX.write(updatedWorkbook, { bookType: 'xlsx', type: 'binary' });
+
+// Convert binary string to ArrayBuffer
+function s2ab(s) {
+    var buf = new ArrayBuffer(s.length);
+    var view = new Uint8Array(buf);
+    for (var i = 0; i < s.length; i++) {
+        view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buf;
+}
+
+// Save the workbook as a file
+saveAs(new Blob([s2ab(wbout)], { type: 'application/octet-stream' }), 'updated_excel.xlsx');
+
+});
+
+// Toggle row selection on click
+document.getElementById('excelData').addEventListener('click', function(event) {
+    if (event.target.matches('input[type="checkbox"]')) {
+        var checkbox = event.target;
+        var row = checkbox.closest('tr');
+        row.classList.toggle('selectedRow');
+    }
+});
+</script>
+
+</body>
+</html>
